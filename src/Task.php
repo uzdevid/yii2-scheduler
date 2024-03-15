@@ -169,7 +169,7 @@ abstract class Task extends Component {
         $isDue = in_array($model->status_id, [SchedulerTask::STATUS_DUE, SchedulerTask::STATUS_OVERDUE, SchedulerTask::STATUS_ERROR], true);
         $isRunning = $model->status_id === SchedulerTask::STATUS_RUNNING;
         $overdue = false;
-        if ((strtotime($model->started_at) + $this->overdueThreshold) <= time()) {
+        if ((strtotime($model->started_at ?? 0) + $this->overdueThreshold) <= time()) {
             $overdue = true;
         }
 
