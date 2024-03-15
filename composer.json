@@ -29,7 +29,7 @@
   "require": {
     "php": ">=8.1",
     "yiisoft/yii2": "^2.0.9",
-    "mtdowling/cron-expression": "~1.0",
+    "dragonmantank/cron-expression": "~3.3.3",
     "webtoolsnz/yii2-widgets": "*"
   },
   "require-dev": {},
