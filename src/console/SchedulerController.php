@@ -122,7 +122,7 @@ class SchedulerController extends Controller {
         $this->trigger(SchedulerEvent::EVENT_BEFORE_RUN, $event);
         foreach ($tasks as $task) {
             $this->runTask($task);
-            if ($task->exception) {
+            if (isset($task->exception)) {
                 $event->success = false;
                 $event->exceptions[] = $task->exception;
             }

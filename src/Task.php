@@ -35,9 +35,9 @@ abstract class Task extends Component {
     /**
      * Exception raised during run (if any)
      *
-     * @var Exception|null
+     * @var Exception
      */
-    public Exception|null $exception;
+    public Exception $exception;
 
     /**
      * Brief description of the task.
