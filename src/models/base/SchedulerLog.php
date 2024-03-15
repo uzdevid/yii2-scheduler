@@ -1,9 +1,12 @@
 <?php
 
-namespace webtoolsnz\scheduler\models\base;
+namespace uzdevid\scheduler\models\base;
 
 use Yii;
+use yii\base\InvalidConfigException;
 use yii\data\ActiveDataProvider;
+use yii\db\ActiveQuery;
+use yii\db\ActiveRecord;
 
 /**
  * This is the base-model class for table "scheduler_log".
@@ -15,39 +18,36 @@ use yii\data\ActiveDataProvider;
  * @property string $output
  * @property integer $error
  *
- * @property \webtoolsnz\scheduler\models\SchedulerTask $schedulerTask
+ * @property \uzdevid\scheduler\models\SchedulerTask $schedulerTask
  */
-class SchedulerLog extends \yii\db\ActiveRecord
-{
+class SchedulerLog extends ActiveRecord {
     /**
      * @inheritdoc
      */
-    public static function tableName()
-    {
+    public static function tableName(): string {
         return 'scheduler_log';
     }
 
     /**
+     * @param int $n
      *
+     * @return string
      */
-    public static function label($n = 1)
-    {
+    public static function label($n = 1): string {
         return Yii::t('app', '{n, plural, =1{Scheduler Log} other{Scheduler Logs}}', ['n' => $n]);
     }
 
     /**
-     *
+     * @return string
      */
-    public function __toString()
-    {
-        return (string) $this->id;
+    public function __toString() {
+        return (string)$this->id;
     }
 
     /**
      * @inheritdoc
      */
-    public function rules()
-    {
+    public function rules(): array {
         return [
             [['scheduler_task_id', 'output'], 'required'],
             [['scheduler_task_id', 'error'], 'integer'],
@@ -59,8 +59,7 @@ class SchedulerLog extends \yii\db\ActiveRecord
     /**
      * @inheritdoc
      */
-    public function attributeLabels()
-    {
+    public function attributeLabels(): array {
         return [
             'id' => Yii::t('app', 'ID'),
             'scheduler_task_id' => Yii::t('app', 'Scheduler Task ID'),
@@ -72,29 +71,28 @@ class SchedulerLog extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getSchedulerTask()
-    {
-        return $this->hasOne(\webtoolsnz\scheduler\models\SchedulerTask::className(), ['id' => 'scheduler_task_id']);
+    public function getSchedulerTask(): ActiveQuery {
+        return $this->hasOne(\uzdevid\scheduler\models\SchedulerTask::class, ['id' => 'scheduler_task_id']);
     }
 
     /**
      * Creates data provider instance with search query applied
      *
-     * @param array $params
+     * @param null $params
      *
      * @return ActiveDataProvider
+     * @throws InvalidConfigException
      */
-    public function search($params = null)
-    {
+    public function search($params = null): ActiveDataProvider {
         $formName = $this->formName();
         $params = !$params ? Yii::$app->request->get($formName, array()) : $params;
         $query = self::find();
 
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
-            'sort' => ['defaultOrder'=>['id'=>SORT_DESC]],
+            'sort' => ['defaultOrder' => ['id' => SORT_DESC]],
         ]);
 
         $this->load($params, $formName);

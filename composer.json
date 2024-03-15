@@ -1,7 +1,12 @@
 {
-  "name": "webtoolsnz/yii2-scheduler",
+  "name": "uzdevid/yii2-scheduler",
   "description": "A scheduled task runner for Yii2 applications",
-  "keywords": ["yii2", "cron", "scheduler", "task"],
+  "keywords": [
+    "yii2",
+    "cron",
+    "scheduler",
+    "task"
+  ],
   "type": "yii2-extension",
   "license": "proprietary",
   "homepage": "https://github.com/webtoolsnz/yii2-scheduler",
@@ -15,25 +20,22 @@
       "email": "support@webtools.co.nz",
       "homepage": "http://www.webtools.co.nz",
       "role": "Developer"
+    },
+    {
+      "name": "Ibragimov Diyorbek",
+      "email": "uzdevid@gmail.com"
     }
   ],
   "require": {
+    "php": ">=8.1",
     "yiisoft/yii2": "^2.0.9",
     "mtdowling/cron-expression": "~1.0",
     "webtoolsnz/yii2-widgets": "*"
   },
-  "require-dev": {
-    "guzzlehttp/guzzle": "~5.0|~4.0",
-    "phpdocumentor/reflection-docblock" : "^2.0",
-    "yiisoft/yii2-codeception": "*",
-    "codeception/codeception": "*",
-    "codeception/specify": "*",
-    "codeception/verify": "*"
-  },
+  "require-dev": {},
   "autoload": {
     "psr-4": {
-      "webtoolsnz\\scheduler\\": "src",
-      "webtoolsnz\\scheduler\\tests\\": "tests"
+      "uzdevid\\scheduler\\": "src"
     }
   }
 }

@@ -3,15 +3,16 @@
  * Update Task View
  *
  * @var yii\web\View $this
- * @var webtoolsnz\scheduler\models\SchedulerTask $model
+ * @var uzdevid\scheduler\models\SchedulerTask $model
  */
 
-use yii\helpers\Html;
-use webtoolsnz\scheduler\models\SchedulerTask;
-use yii\bootstrap\Tabs;
-use yii\bootstrap\ActiveForm;
+use uzdevid\scheduler\models\SchedulerTask;
 use webtoolsnz\widgets\RadioButtonGroup;
+use yii\bootstrap\ActiveForm;
+use yii\bootstrap\Tabs;
 use yii\grid\GridView;
+use yii\helpers\Html;
+use yii\widgets\Pjax;
 
 
 $this->title = $model->__toString();
@@ -20,7 +21,7 @@ $this->params['breadcrumbs'][] = $model->__toString();
 ?>
 <div class="task-update">
 
-    <h1><?=$this->title ?></h1>
+    <h1><?= $this->title ?></h1>
 
     <?php $this->beginBlock('main'); ?>
     <?php $form = ActiveForm::begin([
@@ -60,7 +61,7 @@ $this->params['breadcrumbs'][] = $model->__toString();
 
     <?php $this->beginBlock('logs'); ?>
     <div class="table-responsive">
-        <?php \yii\widgets\Pjax::begin(['id' => 'logs']); ?>
+        <?php Pjax::begin(['id' => 'logs']); ?>
         <?= GridView::widget([
             'layout' => '{summary}{pager}{items}{pager}',
             'dataProvider' => $logDataProvider,
@@ -96,7 +97,7 @@ $this->params['breadcrumbs'][] = $model->__toString();
                 ],
             ],
         ]); ?>
-        <?php \yii\widgets\Pjax::end(); ?>
+        <?php Pjax::end(); ?>
     </div>
     <?php $this->endBlock(); ?>
 
@@ -105,14 +106,14 @@ $this->params['breadcrumbs'][] = $model->__toString();
         'id' => 'customer',
         'items' => [
             'overview' => [
-                'label'   => Yii::t('app', 'Overview'),
+                'label' => Yii::t('app', 'Overview'),
                 'content' => $this->blocks['main'],
-                'active'  => true,
+                'active' => true,
             ],
             'logs' => [
                 'label' => 'Logs',
                 'content' => $this->blocks['logs'],
             ],
         ]
-    ]);?>
+    ]); ?>
 </div>

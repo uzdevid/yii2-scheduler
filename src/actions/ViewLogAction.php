@@ -1,16 +1,17 @@
 <?php
-namespace webtoolsnz\scheduler\actions;
 
-use Yii;
+namespace uzdevid\scheduler\actions;
+
+use uzdevid\scheduler\models\SchedulerLog;
 use yii\base\Action;
-use webtoolsnz\scheduler\models\SchedulerLog;
+use yii\web\HttpException;
 
 /**
  * Class UpdateAction
- * @package webtoolsnz\scheduler\actions
+ *
+ * @package uzdevid\scheduler\actions
  */
-class ViewLogAction extends Action
-{
+class ViewLogAction extends Action {
     /**
      * @var string the view file to be rendered. If not set, it will take the value of [[id]].
      * That means, if you name the action as "index" in "SchedulerController", then the view name
@@ -22,13 +23,13 @@ class ViewLogAction extends Action
      * Runs the action
      *
      * @return string result content
+     * @throws HttpException
      */
-    public function run($id)
-    {
+    public function run($id) {
         $model = SchedulerLog::findOne($id);
 
         if (!$model) {
-            throw new \yii\web\HttpException(404, 'The requested page does not exist.');
+            throw new HttpException(404, 'The requested page does not exist.');
         }
 
         return $this->controller->render($this->view ?: $this->id, [

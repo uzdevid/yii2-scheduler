@@ -1,8 +1,0 @@
-class_name: FunctionalTester
-modules:
-    enabled:
-      - Asserts
-      - Yii2
-    config:
-        Yii2:
-            configFile: 'tests/_config/functional.php'

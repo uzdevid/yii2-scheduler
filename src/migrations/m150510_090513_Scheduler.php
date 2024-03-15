@@ -1,48 +1,45 @@
 <?php
+namespace uzdevid\scheduler\migrations;
 
-use yii\db\Schema;
+use yii\db\Expression;
 use yii\db\Migration;
 
-class m150510_090513_Scheduler extends Migration
-{
-    public function safeUp()
-    {
+class m150510_090513_Scheduler extends Migration {
+    /**
+     * @return void
+     */
+    public function safeUp(): void {
         $this->createTable('scheduler_log', [
-            'id'=> Schema::TYPE_PK.'',
-            'scheduler_task_id'=> Schema::TYPE_INTEGER.'(11) NOT NULL',
-            'started_at'=> Schema::TYPE_TIMESTAMP.' NOT NULL DEFAULT CURRENT_TIMESTAMP',
-            'ended_at'=> Schema::TYPE_TIMESTAMP.' NULL DEFAULT NULL',
-            'output'=> Schema::TYPE_TEXT.' NOT NULL',
-            'error'=> Schema::TYPE_BOOLEAN.'(1) NOT NULL DEFAULT "0"',
-        ], 'ENGINE=InnoDB');
-
-        $this->createIndex('id_UNIQUE', 'scheduler_log','id',1);
-        $this->createIndex('fk_table1_scheduler_task_idx', 'scheduler_log','scheduler_task_id',0);
+            'id' => $this->primaryKey(),
+            'scheduler_task_id' => $this->integer(11)->notNull(),
+            'started_at' => $this->timestamp()->notNull()->defaultValue(new Expression('CURRENT_TIMESTAMP')),
+            'ended_at' => $this->timestamp()->null()->defaultValue(null),
+            'output' => $this->text()->notNull(),
+            'error' => $this->boolean()->notNull()->defaultValue(false),
+        ]);
 
         $this->createTable('scheduler_task', [
-            'id'=> Schema::TYPE_PK.'',
-            'name'=> Schema::TYPE_STRING.'(45) NOT NULL',
-            'schedule'=> Schema::TYPE_STRING.'(45) NOT NULL',
-            'description'=> Schema::TYPE_TEXT.' NOT NULL',
-            'status_id'=> Schema::TYPE_INTEGER.'(11) NOT NULL',
-            'started_at'=> Schema::TYPE_TIMESTAMP.' NULL DEFAULT NULL',
-            'last_run'=> Schema::TYPE_TIMESTAMP.' NULL DEFAULT NULL',
-            'next_run'=> Schema::TYPE_TIMESTAMP.' NULL DEFAULT NULL',
-            'active'=> Schema::TYPE_BOOLEAN.'(1) NOT NULL DEFAULT "0"',
-        ], 'ENGINE=InnoDB');
+            'id' => $this->primaryKey(),
+            'name' => $this->string(45)->notNull()->unique(),
+            'schedule' => $this->string(45)->notNull(),
+            'description' => $this->text()->notNull(),
+            'status_id' => $this->integer(11)->notNull(),
+            'started_at' => $this->timestamp()->null()->defaultValue(null),
+            'last_run' => $this->timestamp()->null()->defaultValue(null),
+            'next_run' => $this->timestamp()->null()->defaultValue(null),
+            'active' => $this->boolean()->notNull()->defaultValue(false),
+        ]);
 
-        $this->createIndex('id_UNIQUE', 'scheduler_task','id',1);
-        $this->createIndex('name_UNIQUE', 'scheduler_task','name',1);
         $this->addForeignKey('fk_scheduler_log_scheduler_task_id', 'scheduler_log', 'scheduler_task_id', 'scheduler_task', 'id');
     }
 
-    public function safeDown()
-    {
-        $this->delete('scheduler_log');
-        $this->delete('scheduler_task');
-
-        $this->dropForeignKey('fk_scheduler_log_scheduler_task_id', 'scheduler_log');
+    /**
+     * @return bool
+     */
+    public function safeDown(): bool {
         $this->dropTable('scheduler_log');
         $this->dropTable('scheduler_task');
+
+        return true;
     }
 }

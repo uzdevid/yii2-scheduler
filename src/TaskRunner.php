@@ -1,24 +1,26 @@
 <?php
-namespace webtoolsnz\scheduler;
 
+namespace uzdevid\scheduler;
+
+use uzdevid\scheduler\events\TaskEvent;
+use uzdevid\scheduler\models\SchedulerLog;
+use uzdevid\scheduler\models\SchedulerTask;
 use Yii;
-use webtoolsnz\scheduler\events\TaskEvent;
-use webtoolsnz\scheduler\models\SchedulerLog;
-use webtoolsnz\scheduler\models\SchedulerTask;
+use yii\base\Component;
 use yii\base\ErrorException;
 use yii\base\Exception;
 
 /**
  * Class TaskRunner
  *
- * @package webtoolsnz\scheduler
- * @property \webtoolsnz\scheduler\Task $task
+ * @package uzdevid\scheduler
+ * @property Task $task
  */
-class TaskRunner extends \yii\base\Component
-{
+class TaskRunner extends Component {
 
     /**
      * Indicates whether an error occured during the executing of the task.
+     *
      * @var bool
      */
     public $error;
@@ -26,12 +28,12 @@ class TaskRunner extends \yii\base\Component
     /**
      * The task that will be executed.
      *
-     * @var \webtoolsnz\scheduler\Task
+     * @var Task
      */
     private $_task;
 
     /**
-     * @var \webtoolsnz\scheduler\models\SchedulerLog
+     * @var SchedulerLog
      */
     private $_log;
 
@@ -43,40 +45,35 @@ class TaskRunner extends \yii\base\Component
     /**
      * @param Task $task
      */
-    public function setTask(Task $task)
-    {
+    public function setTask(Task $task) {
         $this->_task = $task;
     }
 
     /**
      * @return Task
      */
-    public function getTask()
-    {
+    public function getTask() {
         return $this->_task;
     }
 
     /**
-     * @param \webtoolsnz\scheduler\models\SchedulerLog $log
+     * @param SchedulerLog $log
      */
-    public function setLog($log)
-    {
+    public function setLog($log) {
         $this->_log = $log;
     }
 
     /**
      * @return SchedulerLog
      */
-    public function getLog()
-    {
+    public function getLog() {
         return $this->_log;
     }
 
     /**
      * @param bool $forceRun
      */
-    public function runTask($forceRun = false)
-    {
+    public function runTask($forceRun = false) {
         $task = $this->getTask();
 
         if ($task->shouldRun($forceRun)) {
@@ -111,14 +108,13 @@ class TaskRunner extends \yii\base\Component
     }
 
     /**
-     * If the yii error handler has been overridden with `\webtoolsnz\scheduler\ErrorHandler`,
+     * If the yii error handler has been overridden with `\uzdevid\scheduler\ErrorHandler`,
      * pass it this instance of TaskRunner, so it can update the state of tasks in the event of a fatal error.
      */
-    public function shutdownHandler()
-    {
+    public function shutdownHandler() {
         $errorHandler = Yii::$app->getErrorHandler();
 
-        if ($errorHandler instanceof \webtoolsnz\scheduler\ErrorHandler) {
+        if ($errorHandler instanceof ErrorHandler) {
             Yii::$app->getErrorHandler()->taskRunner = $this;
         }
     }
@@ -126,8 +122,7 @@ class TaskRunner extends \yii\base\Component
     /**
      * @param \Exception|ErrorException|Exception $exception
      */
-    public function handleError(\Exception $exception)
-    {
+    public function handleError(\Exception $exception) {
         echo sprintf(
             "%s: %s \n\n Stack Trace: \n %s",
             method_exists($exception, 'getName') ? $exception->getName() : get_class($exception),
@@ -136,13 +131,13 @@ class TaskRunner extends \yii\base\Component
         );
 
         // if the failed task was mid transaction, rollback so we can save.
-        if (null !== ($tx = \Yii::$app->db->getTransaction())) {
+        if (null !== ($tx = Yii::$app->db->getTransaction())) {
             $tx->rollBack();
         }
 
         $output = '';
 
-        if(ob_get_length() > 0) {
+        if (ob_get_length() > 0) {
             $output = ob_get_contents();
             ob_end_clean();
         }
@@ -163,8 +158,7 @@ class TaskRunner extends \yii\base\Component
     /**
      * @param string $output
      */
-    public function log($output)
-    {
+    public function log($output) {
         $model = $this->getTask()->getModel();
         $log = $this->getLog();
         $log->started_at = $model->started_at;

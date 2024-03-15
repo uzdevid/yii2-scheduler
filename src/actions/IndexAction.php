@@ -1,16 +1,16 @@
 <?php
-namespace webtoolsnz\scheduler\actions;
 
-use Yii;
+namespace uzdevid\scheduler\actions;
+
+use uzdevid\scheduler\models\SchedulerTask;
 use yii\base\Action;
-use webtoolsnz\scheduler\models\SchedulerTask;
 
 /**
  * Class IndexAction
- * @package webtoolsnz\scheduler\actions
+ *
+ * @package uzdevid\scheduler\actions
  */
-class IndexAction extends Action
-{
+class IndexAction extends Action {
     /**
      * @var string the view file to be rendered. If not set, it will take the value of [[id]].
      * That means, if you name the action as "index" in "SchedulerController", then the view name
@@ -23,9 +23,8 @@ class IndexAction extends Action
      *
      * @return string result content
      */
-    public function run()
-    {
-        $model  = new SchedulerTask();
+    public function run() {
+        $model = new SchedulerTask();
         $dataProvider = $model->search($_GET);
 
         return $this->controller->render($this->view ?: $this->id, [

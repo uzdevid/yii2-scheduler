@@ -1,19 +1,25 @@
 <?php
 
 
-namespace webtoolsnz\scheduler;
+namespace uzdevid\scheduler;
 
-use webtoolsnz\scheduler\events\TaskEvent;
-use webtoolsnz\scheduler\models\SchedulerTask;
-use yii\helpers\StringHelper;
 use Cron\CronExpression;
+use DateTime;
+use Exception;
+use uzdevid\scheduler\events\TaskEvent;
+use uzdevid\scheduler\models\SchedulerTask;
+use Yii;
+use yii\base\Component;
+use yii\base\Event;
+use yii\helpers\Inflector;
+use yii\helpers\StringHelper;
 
 /**
  * Class Task
- * @package webtoolsnz\scheduler
+ *
+ * @package uzdevid\scheduler
  */
-abstract class Task extends \yii\base\Component
-{
+abstract class Task extends Component {
     const EVENT_BEFORE_RUN = 'TaskBeforeRun';
     const EVENT_AFTER_RUN = 'TaskAfterRun';
     const EVENT_FAILURE = ' TaskFailure';
@@ -26,7 +32,7 @@ abstract class Task extends \yii\base\Component
     /**
      * Exception raised during run (if any)
      *
-     * @var \Exception|null
+     * @var Exception|null
      */
     public $exception;
 
@@ -64,14 +70,13 @@ abstract class Task extends \yii\base\Component
      */
     private $_model;
 
-    public function init()
-    {
+    public function init() {
         parent::init();
 
-        $lockName = 'TaskLock'.\yii\helpers\Inflector::camelize(self::className());
-        \yii\base\Event::on(self::className(), self::EVENT_BEFORE_RUN, function ($event) use ($lockName) {
+        $lockName = 'TaskLock' . Inflector::camelize(self::className());
+        Event::on(self::className(), self::EVENT_BEFORE_RUN, function ($event) use ($lockName) {
             /* @var $event TaskEvent */
-            $db = \Yii::$app->db;
+            $db = Yii::$app->db;
             $result = $db->createCommand("GET_LOCK(:lockname, 1)", [':lockname' => $lockName])->queryScalar();
 
             if (!$result) {
@@ -79,10 +84,10 @@ abstract class Task extends \yii\base\Component
                 $event->cancel = true;
             }
         });
-        \yii\base\Event::on(self::className(), self::EVENT_AFTER_RUN, function ($event) use ($lockName) {
+        Event::on(self::className(), self::EVENT_AFTER_RUN, function ($event) use ($lockName) {
             // release the lock
             /* @var $event TaskEvent */
-            $db = \Yii::$app->db;
+            $db = Yii::$app->db;
             $db->createCommand("RELEASE_LOCK(:lockname, 1)", [':lockname' => $lockName])->queryScalar();
         });
     }
@@ -96,11 +101,11 @@ abstract class Task extends \yii\base\Component
     abstract public function run();
 
     /**
-     * @param string|\DateTime $currentTime
+     * @param string|DateTime $currentTime
+     *
      * @return string
      */
-    public function getNextRunDate($currentTime = 'now')
-    {
+    public function getNextRunDate($currentTime = 'now') {
         return CronExpression::factory($this->schedule)
             ->getNextRunDate($currentTime)
             ->format('Y-m-d H:i:s');
@@ -109,49 +114,44 @@ abstract class Task extends \yii\base\Component
     /**
      * @return string
      */
-    public function getName()
-    {
+    public function getName() {
         return StringHelper::basename(get_class($this));
     }
 
     /**
      * @param SchedulerTask $model
      */
-    public function setModel($model)
-    {
+    public function setModel($model) {
         $this->_model = $model;
     }
 
     /**
      * @return SchedulerTask
      */
-    public function getModel()
-    {
+    public function getModel() {
         return $this->_model;
     }
 
     /**
      * @param $str
      */
-    public function writeLine($str)
-    {
-        echo $str.PHP_EOL;
+    public function writeLine($str) {
+        echo $str . PHP_EOL;
     }
 
     /**
      * Mark the task as started
      */
-    public function start()
-    {
+    public function start() {
         $model = $this->getModel();
         $model->started_at = date('Y-m-d H:i:s');
-        $model->save(false);}
+        $model->save(false);
+    }
 
     /**
      * Mark the task as stopped.
      */
-    public function stop()
-    {
+    public function stop() {
         $model = $this->getModel();
         $model->last_run = $model->started_at;
         $model->next_run = $this->getNextRunDate();
@@ -161,15 +161,15 @@ abstract class Task extends \yii\base\Component
 
     /**
      * @param bool $forceRun
+     *
      * @return bool
      */
-    public function shouldRun($forceRun = false)
-    {
+    public function shouldRun($forceRun = false) {
         $model = $this->getModel();
         $isDue = in_array($model->status_id, [SchedulerTask::STATUS_DUE, SchedulerTask::STATUS_OVERDUE, SchedulerTask::STATUS_ERROR]);
         $isRunning = $model->status_id == SchedulerTask::STATUS_RUNNING;
         $overdue = false;
-        if((strtotime($model->started_at) + $this->overdueThreshold) <= strtotime("now")) {
+        if ((strtotime($model->started_at) + $this->overdueThreshold) <= strtotime("now")) {
             $overdue = true;
         }
 

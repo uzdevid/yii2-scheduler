@@ -1,19 +1,19 @@
 <?php
 
-namespace webtoolsnz\scheduler\events;
+namespace uzdevid\scheduler\events;
 
-use webtoolsnz\scheduler\Task;
+use Exception;
+use uzdevid\scheduler\Task;
 use yii\base\Event;
 
-class TaskEvent extends Event
-{
+class TaskEvent extends Event {
     /**
      * @var Task
      */
     public $task;
 
     /**
-     * @var \Exception
+     * @var Exception
      */
     public $exception;
 

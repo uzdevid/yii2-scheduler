@@ -1,26 +1,25 @@
 <?php
 
-namespace webtoolsnz\scheduler\models;
+namespace uzdevid\scheduler\models;
 
-use Yii;
+use yii\db\ActiveRecord;
 use yii\helpers\Inflector;
 
 /**
  * This is the model class for table "scheduler_task".
  */
-class SchedulerTask extends \webtoolsnz\scheduler\models\base\SchedulerTask
-{
-    const STATUS_INACTIVE = 0;
-    const STATUS_PENDING = 10;
-    const STATUS_DUE = 20;
-    const STATUS_RUNNING = 30;
-    const STATUS_OVERDUE = 40;
-    const STATUS_ERROR = 50;
+class SchedulerTask extends base\SchedulerTask {
+    public const STATUS_INACTIVE = 0;
+    public const STATUS_PENDING = 10;
+    public const STATUS_DUE = 20;
+    public const STATUS_RUNNING = 30;
+    public const STATUS_OVERDUE = 40;
+    public const STATUS_ERROR = 50;
 
     /**
      * @var array
      */
-    private static $_statuses = [
+    private static array $_statuses = [
         self::STATUS_INACTIVE => 'Inactive',
         self::STATUS_PENDING => 'Pending',
         self::STATUS_DUE => 'Due',
@@ -30,21 +29,21 @@ class SchedulerTask extends \webtoolsnz\scheduler\models\base\SchedulerTask
     ];
 
     /**
-     * Return Taskname
+     * Return TaskName
+     *
      * @return string
      */
-    public function __toString()
-    {
+    public function __toString() {
         return Inflector::camel2words($this->name);
     }
 
     /**
      * @param $task
-     * @return array|null|SchedulerTask|\yii\db\ActiveRecord
+     *
+     * @return array|null|SchedulerTask|ActiveRecord
      */
-    public static function createTaskModel($task)
-    {
-        $model = SchedulerTask::find()
+    public static function createTaskModel($task): SchedulerTask|array|ActiveRecord|null {
+        $model = self::find()
             ->where(['name' => $task->getName()])
             ->one();
 
@@ -67,32 +66,30 @@ class SchedulerTask extends \webtoolsnz\scheduler\models\base\SchedulerTask
     /**
      * @return string|null
      */
-    public function getStatus()
-    {
-        return isset(self::$_statuses[$this->status_id]) ? self::$_statuses[$this->status_id] : null;
+    public function getStatus(): ?string {
+        return self::$_statuses[$this->status_id] ?? null;
     }
 
 
     /**
      * Update the status of the task based on various factors.
      */
-    public function updateStatus()
-    {
+    public function updateStatus(): void {
         $status = $this->status_id;
         $isDue = in_array(
-            $status,
-            [
-                self::STATUS_PENDING,
-                self::STATUS_DUE,
-                self::STATUS_OVERDUE,
-            ]
-        ) && strtotime($this->next_run) <= time();
+                $status,
+                [
+                    self::STATUS_PENDING,
+                    self::STATUS_DUE,
+                    self::STATUS_OVERDUE,
+                ]
+            ) && strtotime($this->next_run) <= time();
 
-        if ($isDue && $this->started_at == null) {
+        if ($isDue && $this->started_at === null) {
             $status = self::STATUS_DUE;
         } elseif ($this->started_at !== null) {
             $status = self::STATUS_RUNNING;
-        } elseif ($this->status_id == self::STATUS_ERROR) {
+        } elseif ($this->status_id === self::STATUS_ERROR) {
             $status = $this->status_id;
         } elseif (!$isDue) {
             $status = self::STATUS_PENDING;
@@ -105,8 +102,12 @@ class SchedulerTask extends \webtoolsnz\scheduler\models\base\SchedulerTask
         $this->status_id = $status;
     }
 
-    public function beforeSave($insert)
-    {
+    /**
+     * @param $insert
+     *
+     * @return bool
+     */
+    public function beforeSave($insert): bool {
         $this->updateStatus();
         return parent::beforeSave($insert);
     }

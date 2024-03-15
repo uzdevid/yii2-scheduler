@@ -1,41 +1,39 @@
 <?php
 
-namespace webtoolsnz\scheduler;
+namespace uzdevid\scheduler;
 
 use yii\base\ErrorException;
 
 /**
  * Class ErrorHandler
- * @package webtoolsnz\scheduler
+ *
+ * @package uzdevid\scheduler
  */
-class ErrorHandler extends \yii\console\ErrorHandler
-{
+class ErrorHandler extends \yii\console\ErrorHandler {
     public $memoryReserveSize = 2097152;
 
     /**
-     * @var TaskRunner
+     * @var TaskRunner|null
      */
-    public $taskRunner;
+    public TaskRunner|null $taskRunner = null;
 
     /**
      *  We need to override the register method to register our own shutdown handler and prevent yii from
      *  intercepting our error handler.
      */
-    public function register()
-    {
+    public function register(): void {
         register_shutdown_function([$this, 'schedulerShutdownHandler']);
     }
 
-    public function schedulerShutdownHandler()
-    {
+    public function schedulerShutdownHandler(): void {
         $error = error_get_last();
 
-        if ($error && $this->taskRunner && E_ERROR == $error['type']) {
+        if ($error && $this->taskRunner && E_ERROR === $error['type']) {
             $exception = new ErrorException($error['message'], $error['type'], $error['type'], $error['file'], $error['line']);
             $this->taskRunner->handleError($exception);
         }
 
-        // Allow yiis error handler to take over and handle logging
-        parent::handleFatalError();
+        // Allow Yii's error handler to take over and handle logging
+        $this->handleFatalError();
     }
 }

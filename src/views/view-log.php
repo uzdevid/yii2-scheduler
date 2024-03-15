@@ -3,12 +3,11 @@
  * Update Task View
  *
  * @var yii\web\View $this
- * @var webtoolsnz\scheduler\models\SchedulerLog $model
+ * @var uzdevid\scheduler\models\SchedulerLog $model
  */
 
+use uzdevid\scheduler\models\SchedulerTask;
 use yii\helpers\Html;
-use webtoolsnz\scheduler\models\SchedulerTask;
-
 
 $this->title = $model->__toString();
 $this->params['breadcrumbs'][] = ['label' => SchedulerTask::label(2), 'url' => ['index']];
@@ -18,7 +17,7 @@ $this->params['breadcrumbs'][] = $model->__toString();
 
 <div class="">
 
-    <h1><?=$this->title ?></h1>
+    <h1><?= $this->title ?></h1>
 
     <div class="well">
         <dl class="dl-horizontal">

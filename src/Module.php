@@ -1,41 +1,48 @@
 <?php
-namespace webtoolsnz\scheduler;
 
-use webtoolsnz\scheduler\models\SchedulerLog;
+namespace uzdevid\scheduler;
+
+use ReflectionException;
+use uzdevid\scheduler\models\SchedulerLog;
+use uzdevid\scheduler\models\SchedulerTask;
 use Yii;
 use yii\base\BootstrapInterface;
-use webtoolsnz\scheduler\models\SchedulerTask;
+use yii\base\ErrorException;
+use yii\base\InvalidConfigException;
+use yii\console\Application;
 use yii\helpers\ArrayHelper;
 
 /**
  * Class Module
- * @package webtoolsnz\scheduler
+ *
+ * @package uzdevid\scheduler
  */
-class Module extends \yii\base\Module implements BootstrapInterface
-{
+class Module extends \yii\base\Module implements BootstrapInterface {
     /**
      * Path where task files can be found in the application structure.
+     *
      * @var string
      */
     public $taskPath = '@app/tasks';
 
     /**
      * Namespace that tasks use.
+     *
      * @var string
      */
     public $taskNameSpace = 'app\tasks';
 
     /**
      * Bootstrap the console controllers.
+     *
      * @param \yii\base\Application $app
      */
-    public function bootstrap($app)
-    {
+    public function bootstrap($app) {
         Yii::setAlias('@scheduler', dirname(__DIR__) . DIRECTORY_SEPARATOR . 'src');
 
-        if ($app instanceof \yii\console\Application && !isset($app->controllerMap[$this->id])) {
+        if ($app instanceof Application && !isset($app->controllerMap[$this->id])) {
             $app->controllerMap[$this->id] = [
-                'class' => 'webtoolsnz\scheduler\console\SchedulerController',
+                'class' => 'uzdevid\scheduler\console\SchedulerController',
             ];
         }
     }
@@ -45,14 +52,13 @@ class Module extends \yii\base\Module implements BootstrapInterface
      * creates a new instance of each class and appends it to an array, which it returns.
      *
      * @return Task[]
-     * @throws \yii\base\ErrorException
+     * @throws ErrorException
      */
-    public function getTasks()
-    {
+    public function getTasks() {
         $dir = Yii::getAlias($this->taskPath);
 
         if (!is_readable($dir)) {
-            throw new \yii\base\ErrorException("Task directory ($dir) does not exist");
+            throw new ErrorException("Task directory ($dir) does not exist");
         }
 
         $files = array_diff(scandir($dir), array('..', '.'));
@@ -78,13 +84,13 @@ class Module extends \yii\base\Module implements BootstrapInterface
      *
      * @param Task[] $tasks
      */
-    public function cleanTasks($tasks)
-    {
+    public function cleanTasks($tasks) {
         $currentTasks = ArrayHelper::map($tasks, function ($task) {
             return $task->getName();
         }, 'description');
 
-        foreach (SchedulerTask::find()->indexBy('name')->all() as $name => $task) { /* @var SchedulerTask $task */
+        foreach (SchedulerTask::find()->indexBy('name')->all() as $name => $task) {
+            /* @var SchedulerTask $task */
             if (!array_key_exists($name, $currentTasks)) {
                 SchedulerLog::deleteAll(['scheduler_task_id' => $task->id]);
                 $task->delete();
@@ -97,17 +103,17 @@ class Module extends \yii\base\Module implements BootstrapInterface
      * If the task doesn't exist, null will be returned.
      *
      * @param $className
+     *
      * @return null|object
-     * @throws \yii\base\InvalidConfigException
+     * @throws InvalidConfigException
      */
-    public function loadTask($className)
-    {
+    public function loadTask($className) {
         $className = implode('\\', [$this->taskNameSpace, $className]);
 
         try {
             $task = Yii::createObject($className);
             $task->setModel(SchedulerTask::createTaskModel($task));
-        } catch (\ReflectionException $e) {
+        } catch (ReflectionException $e) {
             $task = null;
         }
 

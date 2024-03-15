@@ -1,13 +1,12 @@
 <?php
 
 
-namespace webtoolsnz\scheduler\events;
+namespace uzdevid\scheduler\events;
 
 use yii\base\Event;
 
 
-class SchedulerEvent extends Event
-{
+class SchedulerEvent extends Event {
     const EVENT_BEFORE_RUN = 'SchedulerBeforeRun';
     const EVENT_AFTER_RUN = 'SchedulerAfterRun';
 

@@ -15,7 +15,7 @@ The preferred way to install this extension is through [composer](http://getcomp
 Install using the following command.
 
 ~~~bash
-$ composer require webtoolsnz/yii2-scheduler
+$ composer require uzdevid/yii2-scheduler
 ~~~
 
 Now that the  package has been installed you need to configure the module in your application
@@ -24,11 +24,11 @@ The `config/console.php` file should be updated to reflect the changes below
 ~~~php
     'bootstrap' => ['log', 'scheduler'],
     'modules' => [
-        'scheduler' => ['class' => 'webtoolsnz\scheduler\Module'],
+        'scheduler' => ['class' => 'uzdevid\scheduler\Module'],
     ],
     'components' => [
         'errorHandler' => [
-            'class' => 'webtoolsnz\scheduler\ErrorHandler'
+            'class' => 'uzdevid\scheduler\ErrorHandler'
         ],
         'log' => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
@@ -53,8 +53,8 @@ The `config/console.php` file should be updated to reflect the changes below
 also add this to the top of your `config/console.php` file
 ~~~php
 \yii\base\Event::on(
-    \webtoolsnz\scheduler\console\SchedulerController::className(),
-    \webtoolsnz\scheduler\events\SchedulerEvent::EVENT_AFTER_RUN,
+    \uzdevid\scheduler\console\SchedulerController::className(),
+    \uzdevid\scheduler\events\SchedulerEvent::EVENT_AFTER_RUN,
     function ($event) {
         if (!$event->success) {
             foreach($event->exceptions as $exception) {
@@ -69,7 +69,7 @@ To implement the GUI for scheduler also add the following to your `config/web.ph
 ~~~php
     'bootstrap' => ['log', 'scheduler'],
     'modules' => [
-        'scheduler' => ['class' => 'webtoolsnz\scheduler\Module'],
+        'scheduler' => ['class' => 'uzdevid\scheduler\Module'],
     ],
 ~~~
 
@@ -78,7 +78,7 @@ After the configuration files have been updated, a `tasks` directory will need t
 
 Run the database migrations, which will create the necessary tables for `scheduler`
 ~~~bash
-php yii migrate up --migrationPath=vendor/webtoolsnz/yii2-scheduler/src/migrations
+php yii migrate up --migrationPath=vendor/uzdevid/yii2-scheduler/src/migrations
 ~~~
 
 Add a controller
@@ -99,15 +99,15 @@ class SchedulerController extends Controller
     {
         return [
             'index' => [
-                'class' => 'webtoolsnz\scheduler\actions\IndexAction',
+                'class' => 'uzdevid\scheduler\actions\IndexAction',
                 'view' => '@scheduler/views/index',
             ],
             'update' => [
-                'class' => 'webtoolsnz\scheduler\actions\UpdateAction',
+                'class' => 'uzdevid\scheduler\actions\UpdateAction',
                 'view' => '@scheduler/views/update',
             ],
             'view-log' => [
-                'class' => 'webtoolsnz\scheduler\actions\ViewLogAction',
+                'class' => 'uzdevid\scheduler\actions\ViewLogAction',
                 'view' => '@scheduler/views/view-log',
             ],
         ];
@@ -128,7 +128,7 @@ namespace app\tasks;
  * Class AlphabetTask
  * @package app\tasks
  */
-class AlphabetTask extends \webtoolsnz\scheduler\Task
+class AlphabetTask extends \uzdevid\scheduler\Task
 {
     public $description = 'Prints the alphabet';
     public $schedule = '0 * * * *';
@@ -191,7 +191,7 @@ Event::on(AlphabetTask::className(), AlphabetTask::EVENT_AFTER_RUN, function ($e
 or at the global level, to throw errors in `/yii`
 
 ```php
-$application->on(\webtoolsnz\scheduler\events\SchedulerEvent::EVENT_AFTER_RUN, function ($event) {
+$application->on(\uzdevid\scheduler\events\SchedulerEvent::EVENT_AFTER_RUN, function ($event) {
     if (!$event->success) {
         foreach($event->exceptions as $exception) {
             throw $exception;

@@ -2,16 +2,20 @@
 /**
  * Index View for scheduled tasks
  *
- * @var \yii\web\View $this
- * @var \yii\data\ActiveDataProvider $dataProvider
- * @var \webtoolsnz\scheduler\models\SchedulerTask $model
+ * @var View $this
+ * @var ActiveDataProvider $dataProvider
+ * @var SchedulerTask $model
  */
-use yii\helpers\Html;
-use yii\helpers\Url;
+
+use uzdevid\scheduler\models\SchedulerTask;
+use yii\data\ActiveDataProvider;
 use yii\grid\GridView;
+use yii\helpers\Html;
+use yii\web\View;
+use yii\widgets\Pjax;
 
 
-$this->title = \webtoolsnz\scheduler\models\SchedulerTask::label(2);
+$this->title = SchedulerTask::label(2);
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 
@@ -20,12 +24,12 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= $this->title ?></h1>
 
     <div class="table-responsive">
-        <?php \yii\widgets\Pjax::begin(); ?>
+        <?php Pjax::begin(); ?>
         <?= GridView::widget([
             'layout' => '{summary}{pager}{items}{pager}',
             'dataProvider' => $dataProvider,
             'pager' => [
-                'class' => yii\widgets\LinkPager::className(),
+                'class' => yii\widgets\LinkPager::class,
                 'firstPageLabel' => Yii::t('app', 'First'),
                 'lastPageLabel' => Yii::t('app', 'Last'),
             ],
@@ -33,7 +37,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 [
                     'attribute' => 'name',
                     'format' => 'raw',
-                    'value' => function ($t) {
+                    'value' => static function ($t) {
                         return Html::a($t->name, ['update', 'id' => $t->id]);
                     }
                 ],
@@ -44,6 +48,6 @@ $this->params['breadcrumbs'][] = $this->title;
                 'status'
             ],
         ]); ?>
-        <?php \yii\widgets\Pjax::end(); ?>
+        <?php Pjax::end(); ?>
     </div>
 </div>
