@@ -96,9 +96,9 @@ abstract class Task extends Component {
      * The main method that gets invoked whenever a task is ran, any errors that occur
      * inside this method will be captured by the TaskRunner and logged against the task.
      *
-     * @return mixed
+     * @return void
      */
-    abstract public function run(): mixed;
+    abstract public function run(): void;
 
     /**
      * @param DateTime|string $currentTime
